@@ -106,20 +106,20 @@ Setting and getting of array of structs (method B) where the “struct” is:
 
 -----------------------------------------------------------------------
 >
-std::vector<std::shared_ptr<AppSampleData>>  aggregate;
-struct AppNestedData 
-{
-	int32_t int32NestedData;
-	int64_t int64NestedData;
-}
+	std::vector<std::shared_ptr<AppSampleData>>  aggregate;
+	struct AppNestedData 
+	{
+		int32_t int32NestedData;
+		int64_t int64NestedData;
+	}
 
-struct AppSampleData 
-{
-	int32_t int32SampleData;
-	int64_t int64SampleData;
-	double doubleSampleData;
-	AppNestedData nestedSampleData;
-}
+	struct AppSampleData 
+	{
+		int32_t int32SampleData;
+		int64_t int64SampleData;
+		double doubleSampleData;
+		AppNestedData nestedSampleData;
+	}
 >
 --------------------------------------------------------------------
 
