@@ -134,7 +134,7 @@ Depending on the environment or scenario other configuration can give some up to
 Thrift: Pooled server, Non-blocking server or Compact protocol
 gRpc: Streams, Asynchronous, Arena. It also supports multiple channels(aka connections) which has no equivalent in Thrift.
 
-However, even comparison of these basic configuration gives some idea about pros/cons of each.
+However, even comparison of these basic configurations gives some idea about pros/cons of each.
 I want to measure throughput per second and standard deviation for 1000 samples. The second one should give me an idea of how predictable(or consistent) the delay is.
 
 Benchmark 1: Same Win64 machine where iPerf measured 11.4 Gbits/sec of inter-process throughput.
@@ -168,7 +168,7 @@ Benchmark 1: Same Win64 machine where iPerf measured 11.4 Gbits/sec of inter-pro
 
 
 
-One can see that Thrift is significantly faster and significantly more consistent(lower standard deviation). However, for complex types (method B) the gap is not as big as for plain data (method A). The possible reason is that type-manipulation of Protobuf-generated types is more efficient.
+One can see that Thrift is significantly faster and remarkably more consistent(lower standard deviation). However, for complex types (method B) the gap is not as big as for plain data (method A). The possible reason is that type-manipulation of Protobuf-generated types is more efficient.
 
 Benchmark 2: Two Win64 machines where iPerf measured 95.0 Mbits/sec inter-process throughput
 
@@ -238,17 +238,20 @@ sD = 22947.09
 
 
 
-When over-socket, you can expect some 15% penalty against ideally implemented socket-based client-to-server communication of plain buffer of size compatible of the size of serialized objects. For local-RPC pipe-based can perform slightly better for easy contention cases.
+When over-socket, you can expect some 15% penalty against ideally implemented socket-based client-to-server communication of plain buffer of size compatible of the size of serialized objects. For local-RPC, pipe-based transport can perform slightly better for easy contention cases.
 
 
 
-For simple models Thrift performs considerably better. gRpc’s delay can be explained be Http/2 and queue against straightforward on-tcp in Thrift case.
+Why Thrift performed considerably better for simple models? Without diving deep into profiling I rushed to blame 2 factors:
+1. Tcp-binary against Http/2
+2. Straightforward on-top-of-socket against queueing
+
 For more complicated models gRpc can win due to load-balancing and asynchronous callbacks.
 
 ## Load balancing
 Thrift has no build-in support for LB. Then connection is established once by client against concrete server point. The way to distribute calls among servers is to work against LB proxy and reconnect.
 
-gRPC client (channel) can wrap multiple connections to multiple server points. Load balancing occurs per each call.
+gRPC client (channel) is designed as a wrapper of potentially multiple connections to multiple server points. Load balancing occurs per each call.
 
 
 ## Special technologies
