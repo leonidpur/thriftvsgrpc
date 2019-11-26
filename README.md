@@ -249,7 +249,7 @@ Why Thrift performed considerably better for simple models? Without diving deep 
 For more complicated models gRpc can win due to load-balancing and asynchronous callbacks.
 
 ## Load balancing
-Thrift has no build-in support for LB. Then connection is established once by client against concrete server point. The way to distribute calls among servers is to work against LB proxy and reconnect.
+Thrift has no build-in support for LB. The connection is established once by client against concrete server point. The way to distribute calls among servers is to reconnect against LB proxy.
 
 gRPC client (channel) is designed as a wrapper of potentially multiple connections to multiple server points. Load balancing occurs per each call.
 
@@ -257,27 +257,27 @@ gRPC client (channel) is designed as a wrapper of potentially multiple connectio
 ## Special technologies
 gRPC is more than idiomatic RPC. Examples of thechnologines absent in Thrift are:
 
-**Streams** - Similar to Websocket’s opposite traffic. Server can return not just concrete data but a “stream”. Client can read the stream as long as Server sends new data. Thrift has no such“callbacks”. If you Thrift’s server has incoming data you should create opposite Server on Client-side
+**Streams** - Similar to Websocket’s opposite traffic. Server can return not just concrete data but a “stream”. Client can read the stream as long as Server sends new data. Thrift has no such“callbacks”. If you Thrift’s server has data to push you should create opposite Server on Client-side
 
 **gRPC/Protobuf Arena** - reuse of memory from pool for frequent object creations
 
-**gRPC call cancelation** - 
+**gRPC call cancelation** - Client can terminate request explicitly or by timeout untill it has returned. 
 
 ## Conclusion
 Which one to choose?
 
 *Thrift* looks preferable when you:
-Looks for mature time-tested idiomatic RPC
-May overwrite specific components if you have custom transport, encoding e.t.c
-Have model of limited scale and looking for the best performer (somewhat sort real-time)  for that concrete model
-You need to economize resources (Embedded platform)
-Your language is not supported by gRPC/Protobuf (For example, Rust)
+* Look for mature, time-tested idiomatic RPC
+* May overwrite specific components if you have custom transport, encoding e.t.c
+* Have model of limited scale and look for the best performer (somewhat sort real-time) for that concrete model
+* You need to economize resources (Embedded platform)
+* Your language is not supported by gRPC/Protobuf (For example, Rust)
 
-Choose *gRpc/Protobuf* if you:
-Your model is scalable (think load-balancing)
-You have data pushes from servers (think streams)
-Your have discovered important primitive types not supported by Thrift in the best way
-Your custom data types are over-complicated and you want memory optimization (Arena)
-You what to cancel long calls
+Choose *gRpc/Protobuf* if:
+* Your model is scalable (think load-balancing)
+* You have data pushes from servers (think streams)
+* You have discovered important primitive types, which are not supported by Thrift in the best way
+* Your custom data types are over-complicated and you want memory optimization (Arena)
+* You want to cancel long calls
 
 Best wishes!
