@@ -1,7 +1,7 @@
 # In search of the best RPC: Thrift vs. gRPC/Protobuf
 
 Why do we need RPC at all?
-In the era of RESTful/JSON RPC might seem to be a redundant option. But is it always true?
+In the era of RESTful/JSON RPC may seem to be a redundant technology. But is it always true?
 C++ doesn’t have native reflection and annotations like other more dynamic languages. RPC's direct parsing (performed by dedicated parser from machine-generated code) is faster by factor than the parsing of REST-based systems. The later actually perform dictionary match between parsed json and reflected objects. RESTful/Json also has more overhead because of HTTP and ASCII encodings. 
 
 So, when performance matters, you prefer RPC. If your client/server application has C++ at least on one side, you may have no other choice but to use RPC. For that reason, this comparison is focused more on the C++ version and less on Java, C#, and Python.
