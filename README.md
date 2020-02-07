@@ -257,19 +257,20 @@ gRPC client (channel) is designed as a wrapper of potentially multiple connectio
 ## Special technologies
 gRPC is more than idiomatic RPC. Examples of thechnologines absent in Thrift are:
 
-**Streams** - Similar to Websocket’s opposite traffic. Server can return not just concrete data but a “stream”. Client can read the stream as long as Server sends new data. Thrift has no such“callbacks”. If you Thrift’s server has data to push you should create opposite Server on Client-side
+**Streams** - Similar to Websocket’s oncoming traffic. Server can return not just concrete data but a handle to “stream”. Client can read the stream as long as Server sends new data. It's very handy feature not only when you get many asynchronous frames from server. Another use can be call to prolonged operation when server returns to client intermadiate statuses. 
+Thrift has no such “callbacks”. If you Thrift’s server has data to push you should create opposite Server on Client-side.
 
 **gRPC/Protobuf Arena** - reuse of memory from pool for frequent object creations
 
-**gRPC call cancelation** - Client can terminate request explicitly or by timeout untill it has returned. 
+**gRPC call cancelation** - Client can terminate request explicitly or by timeout even before it returns. 
 
 ## Conclusion
 Which one to choose?
 
 *Thrift* looks preferable when you:
 * Look for mature, time-tested idiomatic RPC
-* May overwrite specific components if you have custom transport, encoding e.t.c
-* Have model of limited scale and look for the best performer (somewhat sort real-time) for that concrete model
+* Want to overwrite specific components if you have custom transport, encoding e.t.c
+* Have model of limited scale and look for the best performer (somewhat soft real-time) for that concrete model
 * You need to economize resources (Embedded platform)
 * Your language is not supported by gRPC/Protobuf (For example, Rust)
 
@@ -278,6 +279,6 @@ Choose *gRpc/Protobuf* if:
 * You have data pushes from servers (think streams)
 * You have discovered important primitive types, which are not supported by Thrift in the best way
 * Your custom data types are over-complicated and you want memory optimization (Arena)
-* You want to cancel long calls
+* You want ability to cancel long calls
 
 Best wishes!
