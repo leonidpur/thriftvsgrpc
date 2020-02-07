@@ -38,7 +38,7 @@ The list of Thrift-supported languages is great: https://thrift.apache.org/docs/
 The list of gRpc/Proto is more modest: https://developers.google.com/protocol-buffers/docs/proto3  
 Still, the most popular languages are supported by both Thift and Protobuf.
 
-Cross-language calls are absolutely possible. When your client language is different from server’s one you need to “compile” the same interface twice for both client/server languages.
+Cross-language calls are absolutely possible. When your client language is different from server’s one you need to “compile” the same interface twicely for both client/server languages.
 
 ## Supported platforms
 For non-C++ it naturally runs where Language’s VM/Interpreter runs. Concerning C++ Thrift, as far as I saw, any possible combination of cross-platform calls runs well: Windows or Linux, x64, x86, ARM, any Endianness. As for gRpc, I checked Windows to Linux link and it was also ok.
@@ -46,12 +46,12 @@ For non-C++ it naturally runs where Language’s VM/Interpreter runs. Concerning
 ## Call structure
 Thrift is a very idiomatic RPC call. There are multiple or none input parameters of any supported or custom type and one return value or void. It doesn't support COM-style output parameters for a simple reason just because it’s not valid in all target languages. On the other hand, Thrift supports exceptions. You can catch Thrift's exceptions and user-defined exception types.
 
-gRPC reduced the call semantics to the “request-response” paradigm. Always one input parameter(“messages”) and one return “message”. Even if you don’t need one, you have to define “dummy”-empty one type. If the only parameter is “int”, for example, you wrap "int" in custom “message” type. As for errors, it returns error status in c++ or throws error exceptions in java, c#, python. User-type exceptions are not supported.
+gRPC reduced the call semantics to the “request-response” paradigm. Always one input parameter(“message”) and one return “message”. Even if you don’t need one, you have to define “dummy”-empty one type. If the only parameter is “int”, for example, you wrap "int" in custom “message” type. As for errors, it returns error status in c++ or throws error exceptions in java, c#, python. User-type exceptions are not supported.
 ## Supported types
 In both technologies, you can, practically, define every class you want.
 Both support Primitives, Enums, Collections, Nested, e.t.c.
 
-Both don’t: Polymorphism. It’s a common limitation for all RPC implementations. The possible workaround is to duplicate signatures to support all possible subclasses.
+Both don’t: Polymorphism. It’s a common limitation for all RPC implementations. A possible workaround is to duplicate signatures to support all possible subclasses.
 
 However, when it comes to nuances you can notice that not every variable width or encoding is supported.
 https://thrift.apache.org/docs/types
@@ -67,15 +67,15 @@ Other nice features in Protobuf having no equivalent in Thrift:
 The generated C++ or Java code would seem not exactly beautified. Particularly, generated C++ or Java may not be in line with your favorite coding style.
 
 Thrift translates collections into c++ native stl collections.
-Protobuf translates collections into its own collections. The reason: it supports more sophisticated memory models.
+Protobuf translates collections into its own collections. In fact, it supports more sophisticated memory models which can not be implemented in the scope of stl.
 ## Design
 **Thrift**
 Thrift is a self-contained suite. You can use it full-stack for RPC or just only a serialization layer. 
 https://thrift.apache.org/docs/concepts
-It’s a very open architecture and layered in a way similar to the networking stack. There is polymorphism in each layer and you can implement your layer's module. For example, in transport layer abstract TTransport is subclassed to TSocket, THttpTransport and TPipe.
+It’s a very open architecture and layered in a way similar to the Protocol Stack. There is polymorphism in each layer and you can implement your own layer's module. For example, in transport layer abstract TTransport is subclassed to TSocket, THttpTransport and TPipe.
 If you have your special protocol you can subclass TTransport and use it with the rest of the framework instead of/alongside with the known subclasses.
 The same story is the for Protocol layer where it has Binary, JSON, Compact e.t.c.
-As an already supported transport you can choose between TCP, Http, Pipe or UNIX-Domain Socket.
+As for already supported transport you can choose between TCP, Http, Pipe or UNIX-Domain Socket.
 Unfortunately, in the case of the Intra-machine (Local)RPC, there is no transport based on shared-memory. No transport based on ultrafast Windows ALPC.
 
 **gRPC**
