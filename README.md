@@ -93,17 +93,25 @@ Apparently, the queued model is supposed to serve big traffic better. It also sh
 In general, both are considered as best performers.
 
 In my test, the same test framework tests “logically identical“ Thrift and gRpc calls. What's measured?
-I measure time taken by clients-side function which:
-1. packs input in client from user’s entities to machine-generated types
+* Client-side performance
+* Client-side standard deviation
+* Server-side performance
+
+_Client-side performance_ (in bits per second) is amount of data transfered where time is taken for point to point operation from client's point of view:
+1. Start of time. In client side: packing input from user’s entities to machine-generated types
 2. call to interface method
-3. In server-side, implementation function extracts data from generated types and packs machine-generated return value
-4. Client waits for return of the interface method.
+3. In server-side: implementation(callback) function extracts data from generated types to user's entities and packs machine-generated return value
+4. Client waits for return of the interface method. End of time
 
-In other words, it should indicate how efficient is the full-stack of client/server RPC.
+In other words, it should indicate how efficient is the full-stack of client/server RPC. (CSP)
 
-I used 2 benchmarks
-Getting of 1 Mb of “binary” (method A)
-Setting and getting of array of structs (method B) where the “struct” is:
+_Standard deviation_ is a deviation of "Client-side performance" measurements (SD). It should give me an idea about how predictable(or consistent) the delay is.
+
+_Server-side performance_ in bits per second (SSP) In multiclient environment, overall time is measured from appearence if the first client call to the completion of the last client's call.
+
+I used 2 benchmarks. 500 calls of:
+Client gets from server 100 Kb of “binary” (method A)
+Client sets and gets back array of structs (method B) where the “struct” is:
 
 -----------------------------------------------------------------------
 >
@@ -130,22 +138,21 @@ Concerning configurations, I used:
 Thrift: Threaded server, Binary protocol
 gRpc: One-channel client/s, default ServerBuilder, Synchronous, Unary
 
-Two these configurations are logically equivalent.
 Depending on the environment or scenario other configuration can give some up to~20% speed-up, For example:
 Thrift: Pooled server, Non-blocking server or Compact protocol
 gRpc: Streams, Asynchronous, Arena. It also supports multiple channels(aka connections) which has no equivalent in Thrift.
 
 However, even comparison of these basic configurations gives some idea about pros/cons of each.
-I want to measure throughput per second and standard deviation for 1000 samples. The second one should give me an idea of how predictable(or consistent) the delay is.
 
-Benchmark 1: Same Win64 machine where iPerf measured 11.4 Gbits/sec of inter-process throughput.
+
+Benchmark 1: Same Win64 machine where iPerf measured 12.4 Gbits/sec.
 
 | Tables   |      Thrift: <br>method A      |  gRpc:<br> method A |Thrift<br> method B |gRpc:<br> method B |
 |----------|:-------------:|:------:|:------:|:------:|
-| One thread connection |  12.44Gbits/sec <br>sD = 578.44 | 2.08Gbits/sec <br> sD = 3595.73 | 652.03 Mbits/sec<br> sD = 12362.37 | 450.15<br> Mbits/sec sD = 16976.56 |
-| 2-threads/connections |  11.32Gbits <br>sD = 1323.59 | 4.16Gbits <br> sD = 3683.53 | 1.09 Gbits/sec<br> sD = 12954.04 | 873.16 Mbits/sec<br> sD = 17505.14 |
-| 5-threads/connections | 10.68 sD = 3701.62 | 4.26 sD = 5347.03 | 1.96 Gbits/sec sD = 19042.23 | 1.44 Gbits/sec sD = 25893.98 |
-| 10--threads/connections | 9.32 sD = 8329.04 | 2.18 Gbits/sec sD = 42176.65 | 3.35 Gbits/sec sD = 22947.09 | 1.44 Gbits/sec sD = 25893.98 |
+| One thread connection |  7.64Gb/s <br>sD = 98.21 <br>  | 652.03 Mbits/sec<br> sD = 12362.37 | 450.15<br> Mbits/sec sD = 16976.56 |
+| 2-threads/connections |  4.71Gb/s <br>sD = 159.76 <br> ssP = 9.37 Gb/s | 4.16Gbits <br> sD = 3683.53 | 1.09 Gbits/sec<br> sD = 12954.04 | 873.16 Mbits/sec<br> sD = 17505.14 |
+| 5-threads/connections | 2.92 Gb/s, sD = 262.39 ssP=14.13 Gb/s | 4.26 sD = 5347.03 | 1.96 Gbits/sec sD = 19042.23 | 1.44 Gbits/sec sD = 25893.98 |
+| 10--threads/connections | 1.64 Gb/s, 490.66, 16.01 Gb/s | 2.18 Gbits/sec sD = 42176.65 | 3.35 Gbits/sec sD = 22947.09 | 1.44 Gbits/sec sD = 25893.98 |
 
 
 
