@@ -92,7 +92,8 @@ Apparently, the queued model is supposed to serve big traffic better. It also sh
 ## Performance
 In general, both are considered as best performers.
 
-In my test, the same test framework tests “logically identical“ Thrift and gRpc calls. I measure time taken by clients-side function which:
+In my test, the same test framework tests “logically identical“ Thrift and gRpc calls. What's measured?
+I measure time taken by clients-side function which:
 1. packs input in client from user’s entities to machine-generated types
 2. call to interface method
 3. In server-side, implementation function extracts data from generated types and packs machine-generated return value
