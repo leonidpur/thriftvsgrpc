@@ -149,10 +149,10 @@ Benchmark 1: Same Win64 machine where iPerf measured 12.4 Gbits/sec.
 
 | Tables   |      Thrift: <br>method A      |  gRpc:<br> method A |Thrift<br> method B |gRpc:<br> method B |
 |----------|:-------------:|:------:|:------:|:------:|
-| One thread connection |  7.64Gb/s <br>sD = 98.21 <br>  | 1.60 Gb/s, SD=469.55 | 640.97 Mb/s, SD=2598.67 | 433.22 Mb/s, SD=3531.11 |
-| 2-threads/connections |  4.71Gb/s <br>sD = 159.76 <br> ssP = 9.37 Gb/s | 1.92 Gb/s, SD=395.78, SSP=3.82 Gb/s | 1.09 Gbits/sec<br> sD = 12954.04 | 873.16 Mbits/sec<br> sD = 17505.14 |
-| 5-threads/connections | 2.92 Gb/s, sD = 262.39 ssP=14.13 Gb/s | stuck | 1.96 Gbits/sec sD = 19042.23 | 1.44 Gbits/sec sD = 25893.98 |
-| 10--threads/connections | 1.64 Gb/s, 490.66, 16.01 Gb/s | stuck | 3.35 Gbits/sec sD = 22947.09 | 1.44 Gbits/sec sD = 25893.98 |
+| One connection thread |  7.64Gb/s <br>sD = 98.21 <br>  | 1.60 Gb/s, SD=469.55 | 640.97 Mb/s, SD=2598.67 | 433.22 Mb/s, SD=3531.11 |
+| 2-threads |  4.71Gb/s <br>sD = 159.76 <br> ssP = 9.37 Gb/s | 1.92 Gb/s, SD=395.78, SSP=3.82 Gb/s | 1.09 Gbits/sec<br> sD = 12954.04 | 420.43 Mb/s, SD=3646.03, SSP=831.53 Mb/s |
+| 5-threads | 2.92 Gb/s, sD = 262.39 ssP=14.13 Gb/s | stuck | 356.07 MB/s, 4306.85, SSP=1.74 Gb/s | 313.11 Mb/s, 4918.37, SSP=1.53 Gb/s |
+| 10--threads | 1.64 Gb/s, 490.66, 16.01 Gb/s | stuck | 215.30  Mb/s, SD=8345.64, 2.03 Gb/s | 187.92 Mb/s, SD=8503.36, 1.82 Gb/s |
 
 
 
