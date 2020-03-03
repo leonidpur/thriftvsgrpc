@@ -7,64 +7,66 @@ C++ doesn’t have native reflection and annotations like other more dynamic lan
 So, when performance matters, you prefer RPC. If your client/server application has C++ at least on one side, you may have no other choice but to use RPC. For that reason, this comparison is focused more on the C++ version and less on Java, C#, and Python.
 
 Thrift is a self-contained RPC stack. 
-gRPC is a conjunction of gRPC and Protobuf. Protobuf is responsible for interface definition and serialization. gRPC along is for transport and procedure call. In the article, gRPC generally means gRPC/Protobuf pair.
+gRPC is a conjunction of gRPC and Protobuf. Protobuf is responsible for interface definition and serialization. gRPC along is for transport and procedure call. In this blog, gRPC generally means gRPC/Protobuf pair.
 
 
 
 ## Table of contents
 * Introduction
-* Performance 
-* Supported platforms
 * Supported languages
-* Cross-language, cross-platform
-* Supported configurations
+* Supported platforms
+* Call structure
+* Supported data types
 * Generated code
-* Supported data models 
-* Library complexity
+* Design
+* Internal flow
+* Performance
+* Load balancing
+* Only gRPC has...
+* Conclusion
 
 ## Intro
 
 From wiki: “Although developed at Facebook, it is now an open source project in the Apache Software Foundation. The implementation was described in an April 2007 technical paper released by Facebook, now hosted on Apache”
 “gRPC (gRPC Remote Procedure Calls[1]) is an open source remote procedure call (RPC) system initially developed at Google.”
 
-gRPC/Protobuf is released later.
+gRPC/Protobuf was released later.
 
-Basically, both are RPC but:
-gRPC addresses more issues. This paper consists of 2 parts:
+Basically, both are RPC but gRPC addresses more issues. This paper consists of 2 parts:
 1. Close comparison of basic RPC staff which applies to both parties.
 2. Concepts which are not part of “classic” RPC and applicable to only one side (mostly gRPC). 
 ## Supported languages
-The list of Thrift-supported languages is great: https://thrift.apache.org/docs/Languages  
+The list of Thrift-supported languages is impressive: https://thrift.apache.org/docs/Languages  
 The list of gRpc/Proto is more modest: https://developers.google.com/protocol-buffers/docs/proto3  
 Still, the most popular languages are supported by both Thift and Protobuf.
 
 Cross-language calls are absolutely possible. When your client language is different from server’s one you need to “compile” the same interface twicely for both client/server languages.
 
 ## Supported platforms
-For non-C++ it naturally runs where Language’s VM/Interpreter runs. Concerning C++ Thrift, as far as I saw, any possible combination of cross-platform calls runs well: Windows or Linux, x64, x86, ARM, any Endianness. As for gRpc, I checked Windows to Linux link and it was also ok.
+For non-C++ it, naturally, runs where Language’s VM/Interpreter runs. Concerning C++ Thrift, as far as I saw, any possible combination of cross-platform calls runs well: Windows or Linux, x64, x86, ARM, any Endianness. As for gRpc, I checked Windows to Linux link and it was also ok.
 
 ## Call structure
-Thrift is a very idiomatic RPC call. There are multiple or none input parameters of any supported or custom type and one return value or void. It doesn't support COM-style output parameters for a simple reason just because it’s not valid in all target languages. On the other hand, Thrift supports exceptions. You can catch Thrift's exceptions and user-defined exception types.
+Thrift is a very idiomatic RPC call. There are multiple or none input parameters of any supported or custom type and one return value or void. It doesn't support COM-style output parameters for a simple reason just because it’s not valid in all target languages. On the other hand, Thrift supports exceptions. You can catch Thrift's platform exceptions and user-defined exception types.
 
 gRPC reduced the call semantics to the “request-response” paradigm. Always one input parameter(“message”) and one return “message”. Even if you don’t need one, you have to define “dummy”-empty one type. If the only parameter is “int”, for example, you wrap "int" in custom “message” type. As for errors, it returns error status in c++ or throws error exceptions in java, c#, python. User-type exceptions are not supported.
-## Supported types
+## Supported data types
 In both technologies, you can, practically, define every class you want.
 Both support Primitives, Enums, Collections, Nested, e.t.c.
 
-Both don’t: Polymorphism. It’s a common limitation for all RPC implementations. A possible workaround is to duplicate signatures to support all possible subclasses.
+Both don’t: Polymorphism. It seems to be a common limitation for all RPC implementations. A possible workaround is to duplicate function signatures to support all possible subclasses.
 
 However, when it comes to nuances you can notice that not every variable width or encoding is supported.
 https://thrift.apache.org/docs/types
 https://developers.google.com/protocol-buffers/docs/proto3
 
-It can be a serious issue for massive collections. For example, if you need to pass a big collection of small-range decimals: Thrift supports only doubles, while Protobuf both double and float. Protobuf also supports signed/unsigned and fixed-width integers. On the other hand, only Thrift supports 8-bit, 16-bit integers.
+Quite a serious issue for massive collections. For example, if you need to pass a big collection of small-value decimals: Thrift supports only doubles, while Protobuf both double and float. Protobuf also supports signed/unsigned and fixed-width integers. On the other hand, only Thrift supports 8-bit, 16-bit integers.
 
 Other nice features in Protobuf having no equivalent in Thrift:
 “Any” - attaching “black-box” type in messages without defining it in .proto
 “Oneof” - similar to the idea of union in c++. Members of struct reuse common space when defined as “OneOf”.
 
 ## Generated code
-The generated C++ or Java code would seem not exactly beautified. Particularly, generated C++ or Java may not be in line with your favorite coding style.
+The generated code would seem not exactly beautified. Particularly, generated C++ or Java may not be in line with your favorite coding style.
 
 Thrift translates collections into c++ native stl collections.
 Protobuf translates collections into its own collections. In fact, it supports more sophisticated memory models which can not be implemented in the scope of stl.
@@ -98,20 +100,20 @@ In my test, the same test framework tests “logically identical“ Thrift and g
 * Server-side performance
 
 _Client-side performance_ (in bits per second) is amount of data transfered where time is taken for point to point operation from client's point of view:
-1. Start of time. In client side: packing input from user’s entities to machine-generated types
+1. Start of time. In client side: packing input from application’s entities to machine-generated types
 2. call to interface method
-3. In server-side: implementation(callback) function extracts data from generated types to user's entities and packs machine-generated return value
-4. Client waits for return of the interface method. End of time
+3. In server-side: implementation(callback) function extracts data from generated types to application's entities and packs application return entity into machine-generated return value
+4. Client waits for return of the interface method. End of time.
 
-In other words, it should indicate how efficient is the full-stack of client/server RPC. (CSP)
+In other words, it should indicate how efficient is the full-stack of client/server RPC from client's point of view. (CSP)
 
 _Standard deviation_ is a deviation of "Client-side performance" measurements (SD). It should give me an idea about how predictable(or consistent) the delay is.
 
-_Server-side performance_ in bits per second (SSP) In multiclient environment, overall time is measured from appearence if the first client call to the completion of the last client's call.
+_Server-side performance_ in bits per second (SSP). In multiclient environment, overall time is measured from appearence if the first client call to the completion of the last client's call. It's a kind of measurement of possible contention.
 
 I used 2 benchmarks. 500 calls of:
-Client gets from server 100 Kb of “binary” (method A)
-Client sets and gets back array of structs (method B) where the “struct” is:
+Client gets from server 100 Kbype of “binary” (method A)
+Client sets and gets back 100 Kbyte array of structs (method B) where the “struct” is:
 
 -----------------------------------------------------------------------
 >
@@ -136,7 +138,7 @@ As a baseline (for measurement of system/network throughput) I used iPerf (https
 
 Concerning configurations, I used:
 Thrift: Threaded server, Binary protocol
-gRpc: One-channel client/s, default ServerBuilder, Synchronous, Unary
+gRpc: One-channel per client thread, default ServerBuilder, Synchronous, Unary
 
 Depending on the environment or scenario other configuration can give some up to~20% speed-up, For example:
 Thrift: Pooled server, Non-blocking server or Compact protocol
@@ -155,7 +157,7 @@ Benchmark 1: Same Win64 machine where iPerf measured 12.4 Gbits/sec.
 | 10--threads | 1.64 Gb/s, 490.66, 16.01 Gb/s | stuck | 215.30  Mb/s, SD=8345.64, 2.03 Gb/s | 187.92 Mb/s, SD=8503.36, 1.82 Gb/s |
 
 
-One can see that Thrift is significantly faster and remarkably more consistent(lower standard deviation). However, for complex types (method B) the gap is not as big as for plain data (method A). The possible reason is that type-manipulation of Protobuf-generated types is more efficient. Another possible reason is that the gear of sophisticated completion queue moves smother when time is wasted somewere outside the queue.
+We see that Thrift is significantly faster and remarkably more consistent(lower standard deviation). However, for complex types (method B) the gap is not as big as for plain data (method A). The possible reason is that type-manipulation of Protobuf-generated types is more efficient. Another possible reason is that the gear of sophisticated completion queue moves smoother when time is wasted somewere outside the queue.
 
 Why Thrift performed considerably better for simple models? Without diving deep into profiling I rushed to blame 2 factors:
 1. Tcp-binary against Http/2
@@ -169,11 +171,11 @@ Thrift has no build-in support for LB. The connection is established once by cli
 gRPC client (channel) is designed as a wrapper of potentially multiple connections to multiple server points. Load balancing occurs per each call.
 
 
-## Special technologies
+## Only gRPC has
 gRPC is more than idiomatic RPC. Examples of thechnologines absent in Thrift are:
 
-**Streams** - Similar to Websocket’s oncoming traffic. Server can return not just concrete data but a handle to “stream”. Client can read the stream as long as Server sends new data. It's very handy feature not only when you get many asynchronous frames from server. Another use can be call to prolonged operation when server returns to client intermadiate statuses. 
-Thrift has no such “callbacks”. If you Thrift’s server has data to push you should create opposite Server on Client-side.
+**Streams** - Similar to Websocket’s oncoming traffic. Server can return not just concrete data but a handle to “stream”. Client can read the stream as long as Server sends new data. It's very handy feature not only when you get many asynchronous frames from server. Another use can be call to prolonged operation when server can return to client intermadiate statuses. 
+Thrift has no such “callbacks”. If you Thrift’s server has data to push you need to create opposite Server on Client-side.
 
 **gRPC/Protobuf Arena** - reuse of memory from pool for frequent object creations
 
