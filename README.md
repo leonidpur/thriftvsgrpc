@@ -109,7 +109,7 @@ In other words, it should indicate how efficient is the full-stack of client/ser
 
 _Standard deviation (SD)_ is a deviation of "Client-side performance" measurements. It should give me an idea about how predictable(or consistent) the delay is.
 
-_Server-side performance (SSP)_ in bits per second. In multiclient environment, overall time is measured from appearence if the first client call to the completion of the last client's call. It's a kind of measurement of possible contention.
+_Server-side performance (SSP)_ in bits per second. In multiclient environment, overall time is measured from appearence of the first client call to the completion of the last client's call. It's a kind of measurement of possible contention.
 
 I used 2 benchmarks. 500 calls of:
 Client gets from server 100 Kbype of “binary” (method A)
