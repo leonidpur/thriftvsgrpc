@@ -99,17 +99,17 @@ In my test, the same test framework tests “logically identical“ Thrift and g
 * Client-side standard deviation
 * Server-side performance
 
-_Client-side performance_ (in bits per second) is amount of data transfered where time is taken for point to point operation from client's point of view:
+_Client-side performance (CSP)_ (in bits per second) is amount of data transfered where time is taken for point to point operation from client's point of view:
 1. Start of time. In client side: packing input from application’s entities to machine-generated types
 2. call to interface method
 3. In server-side: implementation(callback) function extracts data from generated types to application's entities and packs application return entity into machine-generated return value
 4. Client waits for return of the interface method. End of time.
 
-In other words, it should indicate how efficient is the full-stack of client/server RPC from client's point of view. (CSP)
+In other words, it should indicate how efficient is the full-stack of client/server RPC from client's point of view.
 
-_Standard deviation_ is a deviation of "Client-side performance" measurements (SD). It should give me an idea about how predictable(or consistent) the delay is.
+_Standard deviation (SD)_ is a deviation of "Client-side performance" measurements. It should give me an idea about how predictable(or consistent) the delay is.
 
-_Server-side performance_ in bits per second (SSP). In multiclient environment, overall time is measured from appearence if the first client call to the completion of the last client's call. It's a kind of measurement of possible contention.
+_Server-side performance (SSP)_ in bits per second. In multiclient environment, overall time is measured from appearence if the first client call to the completion of the last client's call. It's a kind of measurement of possible contention.
 
 I used 2 benchmarks. 500 calls of:
 Client gets from server 100 Kbype of “binary” (method A)
