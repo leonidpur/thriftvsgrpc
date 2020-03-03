@@ -147,17 +147,18 @@ gRpc: Streams, Asynchronous, Arena. It also supports multiple channels(aka conne
 However, even comparison of these basic configurations gives some idea about pros/cons of each.
 
 
-Benchmark 1: Same Win64 machine where iPerf measured 12.4 Gbits/sec.
+Benchmark 1: Same Win64 machine where iPerf measured 12.4 Gbits/sec. Versions: Thrift 0.12, gRPC 1.23
 
 | Tables   |      Thrift: <br>method A      |  gRpc:<br> method A |Thrift<br> method B |gRpc:<br> method B |
 |----------|:-------------:|:------:|:------:|:------:|
 | One connection thread |  7.64Gb/s <br>sD = 98.21 <br>  | 1.60 Gb/s, SD=469.55 | 640.97 Mb/s, SD=2598.67 | 433.22 Mb/s, SD=3531.11 |
 | 2-threads |  4.71Gb/s <br>sD = 159.76 <br> ssP = 9.37 Gb/s | 1.92 Gb/s, SD=395.78, SSP=3.82 Gb/s | 545.82 Mb/s, SD=2799.19, SSP=1.06 Gb/s | 420.43 Mb/s, SD=3646.03, SSP=831.53 Mb/s |
-| 5-threads | 2.92 Gb/s, sD = 262.39 ssP=14.13 Gb/s | stuck | 356.07 MB/s, 4306.85, SSP=1.74 Gb/s | 313.11 Mb/s, 4918.37, SSP=1.53 Gb/s |
-| 10--threads | 1.64 Gb/s, 490.66, 16.01 Gb/s | stuck | 215.30  Mb/s, SD=8345.64, 2.03 Gb/s | 187.92 Mb/s, SD=8503.36, 1.82 Gb/s |
+| 5-threads | 2.92 Gb/s, sD = 262.39 ssP=14.13 Gb/s | stuck* | 356.07 MB/s, 4306.85, SSP=1.74 Gb/s | 313.11 Mb/s, 4918.37, SSP=1.53 Gb/s |
+| 10--threads | 1.64 Gb/s, 490.66, 16.01 Gb/s | stuck* | 215.30  Mb/s, SD=8345.64, 2.03 Gb/s | 187.92 Mb/s, SD=8503.36, 1.82 Gb/s |
 
 
 We see that Thrift is significantly faster and remarkably more consistent(lower standard deviation). However, for complex types (method B) the gap is not as big as for plain data (method A). The possible reason is that type-manipulation of Protobuf-generated types is more efficient. Another possible reason is that the gear of sophisticated completion queue moves smoother when time is wasted somewere outside the queue.
+Regarding (*), In case 5 and 10 threads, receiving of plain buffer was stuck in livelock on completion queue. I regard to it as a version issue.
 
 Why Thrift performed considerably better for simple models? Without diving deep into profiling I rushed to blame 2 factors:
 1. Tcp-binary against Http/2
