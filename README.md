@@ -200,3 +200,7 @@ Choose *gRpc/Protobuf* if:
 * You want ability to cancel long calls
 
 Best wishes!
+
+
+THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS of "CC BY-SA v4.0"
+https://creativecommons.org/licenses/by-sa/4.0/deed.en
